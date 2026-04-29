@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Is Data Science Growing in Kenya? | Interactive Study</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --primary: #1167b1;
+      --accent: #18a999;
+      --text: #1d2733;
+      --muted: #5f6b7a;
+      --border: #d9e1ec;
+      --warning: #f4a259;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), #0e4d82);
+      color: #fff;
+      padding: 2rem 1rem;
+    }
+
+    .wrap { max-width: 1050px; margin: 0 auto; }
+    h1, h2, h3 { margin-top: 0; }
+    .lead { opacity: 0.95; max-width: 760px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1rem;
+      margin: 1.25rem 0 2rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 2px 7px rgba(12, 26, 45, 0.05);
+    }
+
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    .metric { font-size: 1.7rem; font-weight: 700; color: var(--primary); }
+    .muted { color: var(--muted); font-size: 0.95rem; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    select, input[type="range"] {
+      width: 100%;
+      max-width: 280px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.6rem;
+      background: #fff;
+    }
+
+    canvas {
+      width: 100%;
+      height: 280px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fcfdff;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.5rem; border-bottom: 1px solid var(--border); text-align: left; }
+    th { background: #f0f5ff; }
+
+    .pill {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      border: 1px solid var(--border);
+      margin-right: 0.4rem;
+      margin-bottom: 0.4rem;
+      background: #fff;
+    }
+
+    .insight {
+      border-left: 4px solid var(--accent);
+      padding: 0.6rem 0.8rem;
+      background: #f4fffd;
+      margin: 0.4rem 0;
+      border-radius: 6px;
+    }
+
+    .risk {
+      border-left-color: var(--warning);
+      background: #fff8f0;
+    }
+
+    footer {
+      padding: 1.5rem 1rem 2rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 860px) {
+      .span-4, .span-6, .span-8, .span-12 { grid-column: span 12; }
+      canvas { height: 240px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Is Data Science Growing in Kenya?</h1>
+      <p class="lead">
+        This interactive study helps Truehost readers explore growth signals in Kenya's data science ecosystem: job demand,
+        training output, salary trends, and sector adoption. Use the filters to model different growth assumptions.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="grid">
+      <article class="card span-4">
+        <h3>Projected DS Roles (2026)</h3>
+        <p class="metric" id="rolesMetric">0</p>
+        <p class="muted">Estimated openings based on selected growth rate.</p>
+      </article>
+      <article class="card span-4">
+        <h3>Training-to-Job Gap</h3>
+        <p class="metric" id="gapMetric">0%</p>
+        <p class="muted">Mismatch between graduates and available roles.</p>
+      </article>
+      <article class="card span-4">
+        <h3>Ecosystem Health Score</h3>
+        <p class="metric" id="healthMetric">0/100</p>
+        <p class="muted">Composite index for momentum and readiness.</p>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>Scenario Controls</h2>
+      <div class="controls">
+        <label>
+          Sector focus
+          <select id="sectorSelect">
+            <option value="all">All sectors</option>
+            <option value="fintech">FinTech</option>
+            <option value="health">HealthTech</option>
+            <option value="agri">AgriTech</option>
+            <option value="public">Public Sector</option>
+          </select>
+        </label>
+
+        <label>
+          Annual growth rate assumption: <strong><span id="growthLabel">18</span>%</strong>
+          <input id="growthSlider" type="range" min="5" max="35" value="18" />
+        </label>
+      </div>
+      <p class="muted">Tip: Drag the slider to test optimistic and conservative growth scenarios.</p>
+    </section>
+
+    <section class="grid">
+      <article class="card span-8">
+        <h2>Demand vs. Talent Pipeline (2021–2026)</h2>
+        <canvas id="trendChart" width="720" height="300" aria-label="Trend chart"></canvas>
+      </article>
+
+      <article class="card span-4">
+        <h2>Regional Momentum</h2>
+        <table>
+          <thead>
+            <tr><th>City</th><th>Momentum</th><th>Top Driver</th></tr>
+          </thead>
+          <tbody id="regionBody"></tbody>
+        </table>
+      </article>
+
+      <article class="card span-6">
+        <h2>Sector Adoption Snapshot</h2>
+        <div id="sectorPills"></div>
+        <div class="insight" id="sectorInsight"></div>
+      </article>
+
+      <article class="card span-6">
+        <h2>Editorial Insights for Truehost</h2>
+        <div class="insight">Kenya shows strong demand growth, especially in data-enabled SMEs and startup ecosystems.</div>
+        <div class="insight">Cloud, analytics, and AI literacy are converging into practical hiring needs.</div>
+        <div class="insight risk">Main constraint: talent depth still lags demand in senior and specialized roles.</div>
+      </article>
+
+      <article class="card span-12">
+        <h2>Conclusion</h2>
+        <p id="conclusionText"></p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    Built as an interactive long-form module for the Truehost content team.
+  </footer>
+
+  <script>
+    const baseData = {
+      all: { jobs2021: 1400, grads2021: 900, salaryMidUSD: 13600, adoption: 74 },
+      fintech: { jobs2021: 520, grads2021: 300, salaryMidUSD: 16200, adoption: 81 },
+      health: { jobs2021: 260, grads2021: 220, salaryMidUSD: 12800, adoption: 66 },
+      agri: { jobs2021: 210, grads2021: 160, salaryMidUSD: 11300, adoption: 61 },
+      public: { jobs2021: 180, grads2021: 140, salaryMidUSD: 10700, adoption: 58 }
+    };
+
+    const regional = [
+      { city: "Nairobi", score: 89, driver: "Startup & enterprise HQs" },
+      { city: "Mombasa", score: 66, driver: "Logistics analytics" },
+      { city: "Kisumu", score: 61, driver: "Health data programs" },
+      { city: "Nakuru", score: 56, driver: "SME digitalization" }
+    ];
+
+    const sectorSelect = document.getElementById("sectorSelect");
+    const growthSlider = document.getElementById("growthSlider");
+    const growthLabel = document.getElementById("growthLabel");
+    const rolesMetric = document.getElementById("rolesMetric");
+    const gapMetric = document.getElementById("gapMetric");
+    const healthMetric = document.getElementById("healthMetric");
+    const regionBody = document.getElementById("regionBody");
+    const sectorPills = document.getElementById("sectorPills");
+    const sectorInsight = document.getElementById("sectorInsight");
+    const conclusionText = document.getElementById("conclusionText");
+    const canvas = document.getElementById("trendChart");
+    const ctx = canvas.getContext("2d");
+
+    function projectSeries(base, growthRate) {
+      const years = [2021, 2022, 2023, 2024, 2025, 2026];
+      const jobs = [];
+      const grads = [];
+
+      years.forEach((_, i) => {
+        const j = Math.round(base.jobs2021 * Math.pow(1 + growthRate / 100, i));
+        const g = Math.round(base.grads2021 * Math.pow(1 + (growthRate - 4) / 100, i));
+        jobs.push(j);
+        grads.push(g);
+      });
+
+      return { years, jobs, grads };
+    }
+
+    function drawChart(series) {
+      const { years, jobs, grads } = series;
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const pad = 36;
+      const maxY = Math.max(...jobs, ...grads) * 1.1;
+      const xStep = (w - pad * 2) / (years.length - 1);
+
+      ctx.strokeStyle = "#ccd8e8";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = pad + ((h - pad * 2) / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(w - pad, y);
+        ctx.stroke();
+      }
+
+      const plot = (vals, color) => {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        vals.forEach((v, i) => {
+          const x = pad + i * xStep;
+          const y = h - pad - (v / maxY) * (h - pad * 2);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      };
+
+      plot(jobs, "#1167b1");
+      plot(grads, "#18a999");
+
+      ctx.fillStyle = "#5f6b7a";
+      ctx.font = "12px sans-serif";
+      years.forEach((year, i) => {
+        const x = pad + i * xStep - 12;
+        ctx.fillText(year, x, h - 12);
+      });
+
+      ctx.fillStyle = "#1167b1";
+      ctx.fillRect(w - 190, 16, 12, 12);
+      ctx.fillStyle = "#1d2733";
+      ctx.fillText("Job demand", w - 172, 26);
+
+      ctx.fillStyle = "#18a999";
+      ctx.fillRect(w - 100, 16, 12, 12);
+      ctx.fillStyle = "#1d2733";
+      ctx.fillText("Graduates", w - 82, 26);
+    }
+
+    function renderRegions() {
+      regionBody.innerHTML = regional
+        .map(r => `<tr><td>${r.city}</td><td>${r.score}/100</td><td>${r.driver}</td></tr>`)
+        .join("");
+    }
+
+    function renderSectorPills() {
+      const rows = [
+        { name: "FinTech", pct: 81 },
+        { name: "HealthTech", pct: 66 },
+        { name: "AgriTech", pct: 61 },
+        { name: "Public Sector", pct: 58 }
+      ];
+      sectorPills.innerHTML = rows.map(s => `<span class="pill">${s.name}: ${s.pct}% adoption</span>`).join("");
+    }
+
+    function update() {
+      const sector = sectorSelect.value;
+      const growth = Number(growthSlider.value);
+      growthLabel.textContent = growth;
+
+      const base = baseData[sector];
+      const series = projectSeries(base, growth);
+      const roles2026 = series.jobs.at(-1);
+      const grads2026 = series.grads.at(-1);
+      const gap = Math.round(((roles2026 - grads2026) / roles2026) * 100);
+      const health = Math.min(100, Math.round((base.adoption * 0.45) + (growth * 1.3) + ((100 - gap) * 0.25)));
+
+      rolesMetric.textContent = roles2026.toLocaleString();
+      gapMetric.textContent = `${gap}%`;
+      healthMetric.textContent = `${health}/100`;
+
+      sectorInsight.textContent = `With a ${growth}% annual growth assumption, ${sector === "all" ? "Kenya overall" : sector} could reach ${roles2026.toLocaleString()} data science roles by 2026, while training output may hit ${grads2026.toLocaleString()}.`;
+
+      conclusionText.textContent = gap > 22
+        ? "Yes—data science is clearly growing in Kenya, but demand is rising faster than talent supply. Organizations should invest in upskilling, internship pipelines, and practical cloud/data tooling."
+        : "Yes—data science is growing in Kenya with healthier talent alignment under this scenario. Continued investment in local training and applied projects can sustain momentum.";
+
+      drawChart(series);
+    }
+
+    sectorSelect.addEventListener("change", update);
+    growthSlider.addEventListener("input", update);
+
+    renderRegions();
+    renderSectorPills();
+    update();
+  </script>
+</body>
+</html>
